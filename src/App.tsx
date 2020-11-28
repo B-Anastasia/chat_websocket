@@ -1,26 +1,47 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
 import './App.css';
+import {io} from "socket.io-client";
+
+const socket = io("http://localhost:3009/");
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [messages, setMessages] = React.useState([{
+        id: "hkjhkk",
+        message: "Hello Dima",
+        userId: "hhkl",
+        name: "Nastya"
+    },
+        {id: "hkjhkk", message: "Hello Nastya", userId: "hhkl", name: "Dima"},
+    ]);
+
+    const [message, setMessage] = useState("Hello");
+
+    useEffect(() => {
+        // const socket = io("http://localhost:3009/");
+        // const socket = io("https://chat-back-io.herokuapp.com/");
+    }, []);
+    return (
+        <div className="App">
+            <div className="App-content">
+                <div className="messages">
+                    {messages.map(m => {
+                        return <div>
+                            <b>{m.name}:</b>{m.message}
+                        </div>
+                    })}
+                </div>
+                <div className="message">
+                    <textarea value={message} onChange={(e) => setMessage(e.currentTarget.value)} cols={20}
+                              rows={5}></textarea>
+                    <button onClick={() => {
+                        socket.emit("client-message-sent", message);
+                        setMessage("");
+                    }}>Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default App;
