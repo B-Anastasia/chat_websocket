@@ -1,37 +1,35 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import './App.css';
-import {io} from "socket.io-client";
-
+import io from "socket.io-client";
+import { v4 as uuidv4 } from "uuid";
 const socket = io("http://localhost:3009/");
 
 function App() {
-    const [messages, setMessages] = React.useState([{
-        id: "hkjhkk",
+    const [messages] = React.useState([{
+        id: uuidv4(),
         message: "Hello Dima",
-        userId: "hhkl",
+        userId: uuidv4(),
         name: "Nastya"
     },
-        {id: "hkjhkk", message: "Hello Nastya", userId: "hhkl", name: "Dima"},
+        {id: uuidv4(), message: "Hello Nastya", userId: uuidv4(), name: "Dima"},
     ]);
 
     const [message, setMessage] = useState("Hello");
 
-    useEffect(() => {
-        // const socket = io("http://localhost:3009/");
-        // const socket = io("https://chat-back-io.herokuapp.com/");
-    }, []);
     return (
         <div className="App">
             <div className="App-content">
                 <div className="messages">
                     {messages.map(m => {
-                        return <div>
+                        return <div key={uuidv4()}>
                             <b>{m.name}:</b>{m.message}
                         </div>
                     })}
                 </div>
                 <div className="message">
-                    <textarea value={message} onChange={(e) => setMessage(e.currentTarget.value)} cols={20}
+                    <textarea value={message}
+                              onChange={(e) => setMessage(e.currentTarget.value)}
+                              cols={20}
                               rows={5}></textarea>
                     <button onClick={() => {
                         socket.emit("client-message-sent", message);
