@@ -1,26 +1,32 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import io from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 const socket = io("http://localhost:3009/");
 
-function App() {
-    const [messages] = React.useState([{
-        id: uuidv4(),
-        message: "Hello Dima",
-        userId: uuidv4(),
-        name: "Nastya"
-    },
-        {id: uuidv4(), message: "Hello Nastya", userId: uuidv4(), name: "Dima"},
-    ]);
+type MessageType = {
+    id: string;
+    name: string;
+    userId: string;
+    message: string;
+}
 
+function App() {
+
+    const [messages, setMessages] = useState<MessageType[]>([]);
     const [message, setMessage] = useState("Hello");
+
+    useEffect(()=>{
+        socket.on("init-messages-published", (messages:MessageType[])=>{
+            setMessages(messages);
+        })
+    },[])
 
     return (
         <div className="App">
             <div className="App-content">
                 <div className="messages">
-                    {messages.map(m => {
+                    {messages.map((m:MessageType) => {
                         return <div key={uuidv4()}>
                             <b>{m.name}:</b>{m.message}
                         </div>
