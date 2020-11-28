@@ -20,6 +20,9 @@ function App() {
         socket.on("init-messages-published", (messages:MessageType[])=>{
             setMessages(messages);
         })
+        socket.on("new-message-sent", (message: MessageType)=>{
+            setMessages(messages=>[...messages, message]);
+        })
     },[])
 
     return (
