@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
 import {v4 as uuidv4} from "uuid";
 import {useDispatch, useSelector} from "react-redux";
-import {createConnection, destroyConnection, sendClientName, sendMessage,} from "./chat-reducer";
+import {createConnection, destroyConnection, sendClientName, sendMessage, typeMessage,} from "./chat-reducer";
 import {AppStateType} from "./index";
 
 export type MessageType = {
@@ -16,11 +16,8 @@ export type MessageType = {
 function App() {
     console.log('rendered');
     const messages = useSelector<AppStateType, MessageType[]>((state) => state.chat.messages);
+    const typingUsers = useSelector<AppStateType, any[]>((state) => state.chat.typingUsers);
     const dispatch = useDispatch();
-    console.log('\x1b[34m%s\x1b[0m','/* Line 20 messages: ',
-    messages ,
-    '*/');
-    // const [messages, setMessages] = useState<MessageType[]>([]);
     const [message, setMessage] = useState("Hello");
     const [name, setName] = useState("Nastya");
     const [autoScrollActive, setAutoScrollActive] = useState(true);
@@ -37,7 +34,7 @@ function App() {
         if (autoScrollActive) {
             myRefAnchor.current?.scrollIntoView({behavior: "smooth"});
         }
-    }, [messages, autoScrollActive]);
+    }, [messages,typingUsers, autoScrollActive]);
 
     return (
 
@@ -46,7 +43,7 @@ function App() {
                 <div className="messages" onScroll={(e) => {
                     let element = e.currentTarget;
                     const maxScrollPosition = element.scrollHeight - element.clientHeight;
-                    if (element.scrollTop > lastScrollTop && Math.abs(maxScrollPosition - element.scrollTop) < 3) {
+                    if (element.scrollTop > lastScrollTop && Math.abs(maxScrollPosition - element.scrollTop) < 10) {
                         setAutoScrollActive(true);
                     } else {
                         setAutoScrollActive(false);
@@ -56,6 +53,11 @@ function App() {
                     {messages.map((m: MessageType) => {
                         return <div key={uuidv4()}>
                             <b>{m.name}:</b>{m.message}
+                        </div>
+                    })}
+                    {typingUsers.map(u=>{
+                        return <div>
+                            <b>{u.name}</b> ...
                         </div>
                     })}
                     <div ref={myRefAnchor}/>
@@ -69,6 +71,9 @@ function App() {
                 </div>
                 <div className="message">
                     <textarea value={message}
+                              onKeyPress={()=>{
+                                  dispatch(typeMessage())
+                              }}
                               onChange={(e) => setMessage(e.currentTarget.value)}
                               cols={20}
                               rows={5}/>

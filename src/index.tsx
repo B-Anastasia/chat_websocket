@@ -15,6 +15,13 @@ export type AppStateType =ReturnType<typeof rootReducer>;
 
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
+store.subscribe(()=>{
+    console.log("state changed");
+})
+store.subscribe(()=>{
+    console.log("state changed 1");
+})
+
 ReactDOM.render(
   <React.StrictMode>
       <Provider store={store}>

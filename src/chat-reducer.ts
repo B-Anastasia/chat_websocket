@@ -3,19 +3,28 @@ import {api} from "./api";
 
 type InitialStateType = {
     messages: MessageType[];
+    typingUsers: any[];
 }
 
 const initialState: InitialStateType = {
-    messages: []
+    messages: [],
+    typingUsers: [],
 };
 
-export const chatReducer = (state:InitialStateType = initialState, action: any):InitialStateType => {
+export const chatReducer = (state: InitialStateType = initialState, action: any): InitialStateType => {
     switch (action.type) {
         case "messages-received": {
             return {...state, messages: action.messages}
         }
         case "new-message-received": {
-            return {...state, messages: [...state.messages, action.message]}
+            return {...state, messages: [...state.messages, action.message],
+            typingUsers: state.typingUsers.filter(u=>u.id!==action.message.userId)}
+        }
+        case "typing-user-added": {
+            return {
+                ...state,
+                typingUsers: [...state.typingUsers.filter(u => u.id !== action.user.id), action.user]
+            }
         }
         default: {
             return state;
@@ -25,23 +34,22 @@ export const chatReducer = (state:InitialStateType = initialState, action: any):
 
 const messagesReceived = (messages: MessageType[]) => ({type: "messages-received", messages});
 const newMessageReceived = (message: MessageType) => ({type: "new-message-received", message});
+const typingUsersAdded = (user: any) => ({type: "typing-user-added", user});
 
 export const createConnection = () => (dispatch: any) => {
 
     api.createConnection();
     api.subscribe(
         (messages: MessageType[]) => {
-            console.log('\x1b[34m%s\x1b[0m','/* Line 30 1: ',
-                1 ,
-                '*/');
             dispatch(messagesReceived(messages))
         },
         (message: MessageType) => {
-            console.log('\x1b[34m%s\x1b[0m','/* Line 30 1: ',
-                1 ,
-                '*/');
             dispatch(newMessageReceived(message))
-        })
+        },
+        (user) => {
+            dispatch(typingUsersAdded(user))
+        }
+    )
 }
 export const destroyConnection = () => (dispatch: any) => {
     api.destroyConnection();
@@ -52,4 +60,8 @@ export const sendClientName = (name: string) => (dispatch: any) => {
 }
 export const sendMessage = (message: string) => (dispatch: any) => {
     api.sendMessage(message);
+}
+
+export const typeMessage = () => (dispatch: any) => {
+    api.typeMessage();
 }
