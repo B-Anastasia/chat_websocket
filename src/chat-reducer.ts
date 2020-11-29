@@ -9,7 +9,7 @@ const initialState: InitialStateType = {
     messages: []
 };
 
-export const chatReducer = (state:InitialStateType = initialState, action: any):InitialStateType => {debugger
+export const chatReducer = (state:InitialStateType = initialState, action: any):InitialStateType => {
     switch (action.type) {
         case "messages-received": {
             return {...state, messages: action.messages}
