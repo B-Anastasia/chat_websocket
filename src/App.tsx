@@ -3,6 +3,7 @@ import './App.css';
 import io from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 const socket = io("http://localhost:3009/");
+// const socket = io("https://chat-back-io.herokuapp.com/");
 
 type MessageType = {
     id: string;
@@ -15,6 +16,7 @@ function App() {
 
     const [messages, setMessages] = useState<MessageType[]>([]);
     const [message, setMessage] = useState("Hello");
+    const [name, setName] = useState("Nastya");
 
     useEffect(()=>{
         socket.on("init-messages-published", (messages:MessageType[])=>{
@@ -34,6 +36,12 @@ function App() {
                             <b>{m.name}:</b>{m.message}
                         </div>
                     })}
+                </div>
+                <div>
+                    <input value={name} onChange={e=>setName(e.currentTarget.value)}/>
+                    <button onClick={()=>{
+                        socket.emit("client-name-sent", name);
+                    }}>Send name</button>
                 </div>
                 <div className="message">
                     <textarea value={message}
