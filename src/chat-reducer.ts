@@ -40,8 +40,9 @@ export const createConnection = () => (dispatch: any) => {
 
     api.createConnection();
     api.subscribe(
-        (messages: MessageType[]) => {
-            dispatch(messagesReceived(messages))
+        (messages: MessageType[], fn: (data: string)=>void) => {
+            dispatch(messagesReceived(messages));
+            fn("data from front");
         },
         (message: MessageType) => {
             dispatch(newMessageReceived(message))

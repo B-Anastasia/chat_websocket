@@ -7,9 +7,10 @@ export const api = {
     socket: null as null | SocketIOClient.Socket,
 
     createConnection() {
-        this.socket = io("http://localhost:3009/");
+        // this.socket = io("http://localhost:3009/");
+        this.socket = io("https://chat-back-io.herokuapp.com/");
     },
-    subscribe(initMessagesHandler: (messages: MessageType[]) => void,
+    subscribe(initMessagesHandler: (messages: MessageType[], fn:(data: string)=>void) => void,
               newMessageSentHandler: (message: MessageType) => void,
               userTypingHandler: (user:any)=>void) {
         this.socket?.on("init-messages-published", initMessagesHandler);
@@ -24,7 +25,7 @@ export const api = {
         this.socket?.emit("client-name-sent", name);
     },
     sendMessage(message:string){
-        this.socket?.emit("client-message-sent", message);
+        this.socket?.emit("client-message-sent", message, (err:string)=>{err && alert(err)});
     },
     typeMessage(){
         this.socket?.emit("client-typed");
